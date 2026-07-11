@@ -11,6 +11,7 @@ CUDA Operator Optimization.
 5. Vector Add / SAXPY
 6. Histogram
 7. CrossFormer(⭐️)
+8. Deepseek v4 Pro(⭐️)
 
 
 
