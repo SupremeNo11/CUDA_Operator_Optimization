@@ -8,6 +8,11 @@ project(GEMM_Optimization
 
 set(CMAKE_CUDA_ARCHITECTURES 61)
 
-set(SOURCES gemm_optimization.cu gemm_cpu.cpp ../utils/src/cuda_common.cu)
+file(GLOB UTILS_SRC
+    ../utils/src/*.cu
+    ../utils/src/*.cpp
+)
+
+set(SOURCES gemm_optimization.cu gemm_cpu.cpp gemm_gpu.cu ${UTILS_SRC})
 
 add_executable(gemm_optimization ${SOURCES})

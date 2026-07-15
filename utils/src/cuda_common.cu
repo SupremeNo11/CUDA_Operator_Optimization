@@ -2,10 +2,12 @@
 
 // Function to initialize a matrix with random values
 // Using 2D vector to represent the matrix
-void initialize_matrix(std::vector<std::vector<float>>& matrix) {
-    for (auto& row : matrix) {
-        for (auto& element : row) {
-            element = static_cast<float>(rand()) / RAND_MAX; // Random float between 0 and 1
+void init_matrix(float* Matrix, int H, int W) 
+{
+    int i, j;
+    for (i = 0; i < H; ++i) {
+        for (j = 0; j < W; ++j) {
+            Matrix[i * W + j] = static_cast<float>(rand()) / RAND_MAX;
         }
     }
 }
