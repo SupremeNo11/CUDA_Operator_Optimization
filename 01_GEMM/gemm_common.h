@@ -6,7 +6,8 @@
 
 void gemm_cpu(float* A, float* B, float* C, const int m, const int n, const int k);
 
-__global__ void gemm_kernel_01(float *A, float *B, float *C, int M, int N, int K);
+__global__ void gemm_kernel_comm(float *A, float *B, float *C, int M, int N, int K);
+template <int BLOCK_SIZE> __global__ void gemm_kernel_smem(float *A, float *B, float *C, int wA, int wB);
 int gemm_gpu(float *A, float *B, float *C, int M, int N, int K);
 
 #endif // GEMM_COMMON_H

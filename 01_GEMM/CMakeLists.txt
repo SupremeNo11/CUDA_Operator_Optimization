@@ -16,3 +16,6 @@ file(GLOB UTILS_SRC
 set(SOURCES gemm_optimization.cu gemm_cpu.cpp gemm_gpu.cu ${UTILS_SRC})
 
 add_executable(gemm_optimization ${SOURCES})
+
+
+# target_compile_definitions(my_target PRIVATE _ENABLE_CPU)

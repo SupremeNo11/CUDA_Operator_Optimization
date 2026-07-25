@@ -22,10 +22,10 @@
 
 typedef enum tagSysStatus
 {
-    SYS_STATUS_SUCCESS      = 0,    
-    SYS_STATUS_CALL_FAIL,           /*function call back failed.*/
+  SYS_STATUS_SUCCESS      = 0,    
+  SYS_STATUS_CALL_FAIL,           /*function call back failed.*/
     
-    SYS_STATUS_MAX
+  SYS_STATUS_MAX
 } SYS_STATUS;
 
 

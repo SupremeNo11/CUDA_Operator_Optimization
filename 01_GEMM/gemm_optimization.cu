@@ -37,6 +37,7 @@ int main()
     // Time the GEMM operation
     std::cout << "Performing GEMM operation..." << std::endl;
 
+#if _ENABLE_CPU
     std::cout << "============================= CPU ==============================\n" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     gemm_cpu(h_A, h_B, h_C, m, n, k);
@@ -52,6 +53,7 @@ int main()
         }
         std::cout << std::endl;
     }
+#endif
 
     std::cout << "============================= GPU ==============================\n" << std::endl;
     // GPU calculate logic
