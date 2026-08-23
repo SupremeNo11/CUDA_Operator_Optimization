@@ -1,5 +1,7 @@
 #include "gemm_common.h"
 
+#define BS 32
+
 /**
  * GEMM Kernel
  */
@@ -64,7 +66,7 @@ template <int BLOCK_SIZE> __global__ void gemm_kernel_smem(float *A, float *B, f
     // B矩阵子矩阵的迭代步幅
     int bStep = BLOCK_SIZE * wB;
 
-    // 每个线程都会提前申请一个变量用于存储电积运算结果
+    // 每个线程都会提前申请一个变量用于存储点积运算结果
     float Csub = 0;
 
     // 开始遍历A和B矩阵，分好几轮计算
@@ -114,7 +116,7 @@ int gemm_gpu(float *A, float *B, float *C, int M, int N, int K)
     CUDA_CHECK(cudaMemcpy(d_B, B, K * N * sizeof(float), cudaMemcpyHostToDevice));
 
     // Calculate
-    dim3 block(16, 16);
+    dim3 block(BS, BS);
     dim3 grid((N + block.x - 1) / block.x, (M + block.y - 1) / block.y);
     // 向上整除，<cuda/cmath> 提供向上整除的方法，CUDA docs 13.3
     // dim3 grid(cuda::ceil_div(N, block.x), cuda::ceil_div(M, block.y));
@@ -134,6 +136,7 @@ int gemm_gpu(float *A, float *B, float *C, int M, int N, int K)
     CUDA_CHECK(cudaEventElapsedTime(&milliseconds, start, end));
     std::cout << "gemm_kernel_comm：GEMM kernel execution time: [" << static_cast<long long>(milliseconds * 1000) << "] us" << std::endl;
 
+#if 0
     // Completed
     // Check the result of the GEMM operation
     std::cout << "Result matrix C (first 3 elements):" << std::endl;
@@ -143,30 +146,37 @@ int gemm_gpu(float *A, float *B, float *C, int M, int N, int K)
         }
         std::cout << std::endl;
     }
+#endif
 
     /**
      * gemm_kernel_smem
      */
     CUDA_CHECK(cudaEventRecord(start));
-    gemm_kernel_smem<16><<<grid, block>>>(d_A, d_B, d_C, K, N);
+    gemm_kernel_smem<BS><<<grid, block>>>(d_A, d_B, d_C, K, N);
     CUDA_CHECK(cudaEventRecord(end));
     CUDA_CHECK(cudaEventSynchronize(end));
 
     CUDA_CHECK(cudaEventElapsedTime(&milliseconds, start, end));
     std::cout << "gemm_kernel_smem: kernel execution time: [" << static_cast<long long>(milliseconds * 1000) << "] us" << std::endl;
+    cudaDeviceSynchronize();
 
     // Compare results
     float* smem_C = new float[M * N];
     CUDA_CHECK(cudaMemcpy(smem_C, d_C, M * N * sizeof(float), cudaMemcpyDeviceToHost));
     for (int i = 0; i < M; ++i) {
         for (int j = 0; j < N; ++j) {
-            if (fabs(C[i * M + j] - smem_C[i * M + j]) > 0.0001)
+            if (fabs(C[i * N + j] - smem_C[i * N + j]) > 0.0001)
             {
                 std::cout << "Result Error!" << std::endl;
                 break;
             }
         }
     }
+
+    cudaDeviceSynchronize();
+
+    cudaEventDestroy(start);
+    cudaEventDestroy(end);
 
     // Free device memmory
     CUDA_CHECK(cudaFree(d_A));
